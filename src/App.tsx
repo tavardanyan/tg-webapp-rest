@@ -1,4 +1,8 @@
-import { useState } from "react";
+import React from "react";
+import ProductList from "./ProductList";
+import { products } from "./data"; // your products data
+import { FiShoppingCart } from "react-icons/fi";
+import CartDrawer from "./CartDrawer";
 
 const categories = [
   { id: 1, name: "Pizza" },
@@ -6,49 +10,18 @@ const categories = [
   { id: 3, name: "Desserts" },
 ];
 
-const products = {
-  Pizza: [
-    {
-      id: 1,
-      title: "Margherita",
-      description: "Classic pizza with tomato, mozzarella and basil",
-      price: 3000,
-      image: "https://via.placeholder.com/100",
-    },
-    {
-      id: 2,
-      title: "Pepperoni",
-      description: "Spicy pepperoni with cheese",
-      price: 3500,
-      image: "https://via.placeholder.com/100",
-    },
-  ],
-  Drinks: [
-    {
-      id: 3,
-      title: "Coca Cola",
-      description: "500ml bottle",
-      price: 800,
-      image: "https://via.placeholder.com/100",
-    },
-  ],
-  Desserts: [
-    {
-      id: 4,
-      title: "Chocolate Cake",
-      description: "Rich chocolate sponge",
-      price: 2000,
-      image: "https://via.placeholder.com/100",
-    },
-  ],
-};
-
 export default function App() {
-  const [view, setView] = useState<"categories" | "products">("categories");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [counts, setCounts] = useState<Record<number, number>>({});
+  const [view, setView] = React.useState("categories");
+  const [selectedCategory, setSelectedCategory] = React.useState(null);
+  const [isCartOpen, setIsCartOpen] = React.useState(false);
+  const [cart, setCart] = React.useState([]); // items: { id, name, price, image?, quantity, ... }
 
-  const handleCategoryClick = (name: string) => {
+  // debug helper (optional)
+  React.useEffect(() => {
+    console.log("cart:", cart);
+  }, [cart]);
+
+  const handleCategoryClick = (name) => {
     setSelectedCategory(name);
     setView("products");
   };
@@ -58,21 +31,65 @@ export default function App() {
     setSelectedCategory(null);
   };
 
-  const increase = (id: number) => {
-    setCounts((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+  // increase expects a product-like object (from catalog or a cart item)
+  const increase = (product) => {
+    setCart((prev) => {
+      const idx = prev.findIndex((it) => String(it.id) === String(product.id));
+      if (idx !== -1) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], quantity: (next[idx].quantity || 0) + 1 };
+        return next;
+      }
+      // normalize fields: prefer name, fallback to title
+      const itemToAdd = {
+        id: product.id,
+        name: product.name ?? product.title ?? "Item",
+        price: product.price ?? 0,
+        image: product.image ?? product.img ?? null,
+        quantity: 1,
+      };
+      return [...prev, itemToAdd];
+    });
   };
 
-  const decrease = (id: number) => {
-    setCounts((prev) => ({
-      ...prev,
-      [id]: Math.max((prev[id] || 0) - 1, 0),
-    }));
+  const decrease = (id) => {
+    setCart((prev) => {
+      const idx = prev.findIndex((it) => String(it.id) === String(id));
+      if (idx === -1) return prev;
+      const next = [...prev];
+      if ((next[idx].quantity || 0) <= 1) {
+        next.splice(idx, 1);
+        return next;
+      }
+      next[idx] = { ...next[idx], quantity: next[idx].quantity - 1 };
+      return next;
+    });
   };
+
+  const getCount = (id) => {
+    return cart.find((it) => String(it.id) === String(id))?.quantity || 0;
+  };
+
+  const totalItems = cart.reduce((s, i) => s + (i.quantity || 0), 0);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
+      {/* Header */}
+      <div className="flex justify-between items-center p-4 bg-white shadow-md">
+        <h1 className="text-xl font-bold">Picola</h1>
+        <button className="relative" onClick={() => setIsCartOpen(true)}>
+          <FiShoppingCart size={24} />
+          {totalItems > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+              {totalItems}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Categories */}
       {view === "categories" && (
-        <div>
+        <div className="mt-4">
           <h1 className="text-xl font-bold mb-4">Categories</h1>
           <div className="grid gap-3">
             {categories.map((c) => (
@@ -88,48 +105,35 @@ export default function App() {
         </div>
       )}
 
+      {/* Products */}
       {view === "products" && selectedCategory && (
-        <div>
+        <div className="mt-4">
           <button onClick={handleBack} className="mb-4 text-blue-600">
             ← Back
           </button>
           <h1 className="text-xl font-bold mb-4">{selectedCategory}</h1>
-          <div className="grid gap-4">
-            {products[selectedCategory]?.map((p) => (
-              <div
-                key={p.id}
-                className="bg-white rounded-xl shadow-md p-4 flex gap-3 items-center"
-              >
-                <img
-                  src={p.image}
-                  alt={p.title}
-                  className="w-20 h-20 object-cover rounded-lg"
-                />
-                <div className="flex-1">
-                  <h2 className="font-semibold">{p.title}</h2>
-                  <p className="text-sm text-gray-600">{p.description}</p>
-                  <p className="font-bold mt-1">{p.price} ֏</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <button
-                      onClick={() => decrease(p.id)}
-                      className="px-2 py-1 bg-gray-200 rounded"
-                    >
-                      -
-                    </button>
-                    <span>{counts[p.id] || 0}</span>
-                    <button
-                      onClick={() => increase(p.id)}
-                      className="px-2 py-1 bg-gray-200 rounded"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {products[selectedCategory]?.length ? (
+            <ProductList
+              products={products[selectedCategory]}
+              increase={increase}
+              decrease={decrease}
+              getCount={getCount}
+            />
+          ) : (
+            <p>No products</p>
+          )}
         </div>
       )}
+
+      {/* Cart Drawer */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cart={cart}
+        setCart={setCart}
+        increase={increase}
+        decrease={decrease}
+      />
     </div>
   );
 }
