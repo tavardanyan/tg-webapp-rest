@@ -85,9 +85,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-white shadow-md h-30">
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-white shadow-md h-50">
         {/* Left: Language Selector */}
-        <div className="w-8 mt-10 flex justify-start" ref={langRef}>
+        <div className="w-8 mt-30 flex justify-start" ref={langRef}>
           <button
             onClick={() => setIsLangOpen(!isLangOpen)}
             className="relative"
@@ -116,11 +116,11 @@ export default function App() {
 
         {/* Center: Logo */}
         <div className="flex-1 flex justify-center">
-          <img src={Logo} alt="Logo" className="h-36 mt-15 rounded-full shadow-xl" />
+          <img src={Logo} alt="Logo" className="h-36 mt-30 rounded-full shadow-xl" />
         </div>
 
         {/* Right: Cart */}
-        <div className="w-8 flex mt-10 justify-start">
+        <div className="w-8 flex mt-30 justify-start">
           <button onClick={() => setIsCartOpen(true)} className="relative">
             <FiShoppingCart size={24} />
             {totalItems > 0 && (
@@ -133,7 +133,7 @@ export default function App() {
       </div>
 
       {/* Content wrapper with padding-top for fixed header */}
-      <div className="pt-32 p-4">
+      <div className="pt-52 p-4">
         {/* Categories */}
         {view === "categories" && (
           <div className="mt-4">
