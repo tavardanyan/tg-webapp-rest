@@ -10,31 +10,89 @@ interface IProducts {
   [category: string]: Product[];
 }
 
+import logo from './assets/logo.jpg';
+
 export const products: IProducts = {
-  Pizza: [
+  'Ապուրներ': [
     {
       id: 1,
-      name: "Margherita",
+      name: "Սպաս",
       description: "Classic pizza with tomato, mozzarella and basil",
-      price: 3000,
-      image: "https://picsum.photos/200/300",
+      price: 650,
+      image: logo,
     },
     {
       id: 2,
-      name: "Pepperoni",
+      name: "Սնկապուր",
       description: "Spicy pepperoni with cheese",
-      price: 3500,
+      price: 800,
       image: "https://picsum.photos/200/300",
     },
+    {
+      id: 5,
+      name: "Դդմապուր",
+      description: "Hearty chicken soup with vegetables",
+      price: 800,
+      image: "https://picsum.photos/200/300",
+    },
+    {
+      id: 6,
+      name: "Բորշ",
+      description: "Creamy potato soup with herbs",
+      price: 1500,
+      image: "https://picsum.photos/200/300",
+    },
+    {
+      id: 7,
+      name: "Հավով ապուր",
+      description: "Creamy potato soup with herbs",
+      price: 1300,
+      image: "https://picsum.photos/200/300",
+    },
+    {
+      id: 8,
+      name: "Տոմատով ապուր",
+      description: "Creamy potato soup with herbs",
+      price: 1300,
+      image: "https://picsum.photos/200/300",
+    }
   ],
-  Drinks: [
+  'Լանչբոքս': [
     {
       id: 3,
-      name: "Coca Cola",
+      name: "Մակարոններ մսով",
       description: "500ml bottle",
       price: 800,
       image: "https://picsum.photos/200/300",
     },
+    {
+      id: 9,
+      name: "Հավով և բանջարեղենով",
+      description: "Crispy golden fries",
+      price: 1200,
+      image: "https://picsum.photos/200/300",
+    },
+    {
+      id: 10,
+      name: "Հնդկա",
+      description: "Juicy beef patty with cheese",
+      price: 2500,
+      image: "https://picsum.photos/200/300",
+    },
+    {
+      id: 11,
+      name: "Հավի սթեյք",
+      description: "Grilled chicken steak",
+      price: 3000,
+      image: "https://picsum.photos/200/300",
+    },
+    {
+      id: 12,
+      name: "Սալաթ Նիկոս",
+      description: "Fresh salad with feta cheese",
+      price: 1800,
+      image: "https://picsum.photos/200/300",
+    }
   ],
   Desserts: [
     {

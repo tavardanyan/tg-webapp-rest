@@ -45,7 +45,7 @@ export default function CartDrawer({ isOpen, onClose, cart, increase, decrease, 
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 flex justify-between items-center border-b">
+        <div className="p-4 mt-20 flex justify-between items-center border-b">
           <h2 className="text-lg font-bold">Your Cart</h2>
           <button onClick={onClose} className="text-gray-500">
             ✕
@@ -116,6 +116,7 @@ export default function CartDrawer({ isOpen, onClose, cart, increase, decrease, 
             </>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-3">
+              <p className="font-medium">Phone Number:</p>
               <input
                 type="text"
                 name="phone"
@@ -125,7 +126,7 @@ export default function CartDrawer({ isOpen, onClose, cart, increase, decrease, 
                 className="w-full border rounded px-2 py-1"
                 required
               />
-              <p className="font-medium">Payment Method:</p>
+              <p className="font-medium">Address:</p>
               <input
                 type="text"
                 name="address"
