@@ -27,6 +27,7 @@ const bot = new Telegraf('8013131602:AAH2MMtXvCM5yAbSQa62P_3BZIGNxIuxCo0');
 // });
 
 bot.on("message", (ctx) => {
+  console.log(ctx)
   const data = ctx.message?.web_app_data?.data;
   if (!data) return;
 
