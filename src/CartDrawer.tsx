@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useTelegram } from "./hooks/useTelegram";
 
 export default function CartDrawer({ isOpen, onClose, cart, increase, decrease, setCart }) {
   const [isCheckout, setIsCheckout] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", address: "", payment: "cash" });
+  const { sendData, user } = useTelegram();
 
   // ✅ Ensure count always exists (default 0)
   const total = cart.reduce(
@@ -22,6 +24,17 @@ export default function CartDrawer({ isOpen, onClose, cart, increase, decrease, 
       alert("All fields are required!");
       return;
     }
+
+    sendData({
+      user: {
+        id: user?.id,
+        first_name: user?.first_name,
+        username: user?.username,
+      },
+      order: cart,
+      customer: form,
+    });
+
     console.log("Submitting order:", { form, cart });
     setConfirmed(true);
     setCart([]);
