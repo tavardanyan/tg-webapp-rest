@@ -21,6 +21,7 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 // });
 
 bot.on("message", async (ctx) => {
+  console.log('New Message: ', ctx.message);
   const data = (ctx.message)?.web_app_data?.data;
   if (!data) return;
 
@@ -35,6 +36,7 @@ bot.on("message", async (ctx) => {
 
 // Vercel serverless entrypoint
 export default async function handler(req, res) {
+  console.log(req)
   if (req.method === "POST") {
     try {
       await bot.handleUpdate(req.body);
