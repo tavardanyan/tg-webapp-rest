@@ -1,28 +1,57 @@
 // api/bot.ts
-import { Telegraf } from "telegraf";
+import { Telegraf, Markup } from "telegraf";
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-// Example: Menu (commented, but works if you want)
-// bot.start((ctx) => {
-//   ctx.reply("Open the menu:", {
-//     reply_markup: {
-//       keyboard: [
-//         [
-//           {
-//             text: "🍽 Open Menu",
-//             web_app: { url: "https://yourdomain.com" },
-//           },
-//         ],
-//       ],
-//       resize_keyboard: true,
-//     },
-//   });
-// });
+// ✅ Replace with your real channel username (with @ or without)
+const CHANNEL = process.env.CHANNEL_USERNAME || "@yourchannel";
 
+// Handle /start with paramId
+bot.start(async (ctx) => {
+  const paramId = ctx.startPayload; // e.g. "12345"
+  const userId = ctx.from.id;
+
+  console.log("User started with:", { userId, paramId });
+
+  if (!paramId) {
+    return ctx.reply("Welcome! Please use a special link to start.");
+  }
+
+  // Send join + confirm buttons
+  await ctx.reply(
+    `👋 Hi! Please subscribe to our channel and confirm.\n\nParamId: ${paramId}`,
+    Markup.inlineKeyboard([
+      [Markup.button.url("📢 Join Channel", `https://t.me/${CHANNEL.replace("@", "")}`)],
+      [Markup.button.callback("✅ I Subscribed", `checksub_${paramId}`)],
+    ])
+  );
+});
+
+// Handle "I Subscribed" button
+bot.action(/checksub_(.+)/, async (ctx) => {
+  const paramId = ctx.match[1];
+  const userId = ctx.from.id;
+
+  try {
+    const member = await ctx.telegram.getChatMember(CHANNEL, userId);
+
+    if (["member", "administrator", "creator"].includes(member.status)) {
+      await ctx.reply(`✅ Subscription confirmed! Your paramId = ${paramId}`);
+      // TODO: Save { userId, paramId } to your DB
+      console.log("Subscribed:", { userId, paramId });
+    } else {
+      await ctx.reply("❌ You are not subscribed yet. Please join the channel first.");
+    }
+  } catch (err) {
+    console.error("Error checking subscription:", err);
+    await ctx.reply("⚠️ Could not verify subscription. Try again later.");
+  }
+});
+
+// Existing WebApp order handler (kept from your code)
 bot.on("message", async (ctx) => {
-  console.log('New Message: ', ctx.message);
-  const data = (ctx.message)?.web_app_data?.data;
+  console.log("New Message:", ctx.message);
+  const data = ctx.message?.web_app_data?.data;
   if (!data) return;
 
   try {
@@ -36,12 +65,11 @@ bot.on("message", async (ctx) => {
 
 // Vercel serverless entrypoint
 export default async function handler(req, res) {
-  console.log(req)
   if (req.method === "POST") {
     try {
       await bot.handleUpdate(req.body);
     } catch (err) {
-      console.error("Error handling update", err);
+      console.error("Error handling update:", err);
     }
     return res.status(200).send("OK");
   }
